@@ -11,13 +11,17 @@ export default class Account extends Component {
     this.handleDepositClick = this.handleDepositClick.bind(this)
   }
 
-  handleDepositClick(e) {
+  handleDepositClick(e, transaction) {
     e.preventDefault();
-    if (isNaN(this.refs.amount.value)) {
-      console.log("Not a number");
+    if (isNaN(this.refs.amount.value) || this.refs.amount.value.includes('-')) {
+      console.log("Invalid input");
     }
     else {
-      let amount = +this.refs.amount.value;
+      if (this.refs.amount.value > this.state.balance && transaction === 'withdrawl') {
+        console.log("Overdraw not enabled");
+        return;
+      }
+      let amount = transaction==='deposit' ? +this.refs.amount.value : -this.refs.amount.value;
       let newBalance = this.state.balance + amount;
       this.setState({
         balance: newBalance
@@ -37,7 +41,8 @@ export default class Account extends Component {
         <h2>{this.props.name}</h2>
         <div className={balanceClass}>${this.state.balance}</div>
         <input type="text" placeholder="enter an amount" ref="amount" />
-        <input type="button" value="Deposit" onClick={this.handleDepositClick} />
+        <input type="button" value="Deposit" onClick={(e)=>{this.handleDepositClick(e, 'deposit')}} />
+        <input type="button" value="Withdrawl" onClick={(e)=>{this.handleDepositClick(e, 'withdrawl')}} />
       </div>
     )
   }
